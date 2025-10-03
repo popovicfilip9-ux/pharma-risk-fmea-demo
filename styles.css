@@ -1,164 +1,349 @@
-// script.js - Updated with Smoother UX, Template Editor, Regulatory Elements
-class PharmaRiskApp {
-    constructor() {
-        this.assessments = JSON.parse(localStorage.getItem('pharmaRiskAssessments')) || [];
-        this.auditTrail = JSON.parse(localStorage.getItem('pharmaRiskAudit')) || [];
-        this.users = JSON.parse(localStorage.getItem('users')) || { admin: 'admin123' };
-        this.templates = JSON.parse(localStorage.getItem('pharmaRiskTemplates')) || this.getDefaultTemplates();
-        this.currentUser = sessionStorage.getItem('currentUser') || null;
-        this.currentAssessmentId = null;
-        this.currentTemplateMode = null;
-        this.currentTemplateType = null;
-        this.initEventListeners();
-        this.updateUI();
-        this.renderAssessments();
-    }
+/* styles.css - Enhanced Professional Design */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
-    getDefaultTemplates() {
-        return {
-            air: {
-                coldchain: [ /* rows */ ],
-                ambient: [],
-                hazardous: []
-            },
-            // Similar for sea, road, multi
-            // Populate with default rows from previous getTransportTemplateRows
-        };
-    }
-
-    initEventListeners() {
-        // Existing + new
-        document.getElementById('templateEditorBtn').addEventListener('click', () => this.showTemplateEditor());
-        document.getElementById('backFromTemplateEditorBtn').addEventListener('click', () => this.showDashboard());
-        document.getElementById('loadTemplateBtn').addEventListener('click', () => this.loadTemplateForEdit());
-        document.getElementById('addTemplateRowBtn').addEventListener('click', () => this.addTemplateRow());
-        document.getElementById('saveTemplateBtn').addEventListener('click', () => this.saveTemplate());
-        document.getElementById('saveReviewBtn').addEventListener('click', () => this.saveReviewNotes());
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'removeTemplateRowBtn') this.removeTemplateRow(e.target.dataset.rowId);
-        });
-        // For smooth transitions
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('section').forEach(sec => sec.classList.add('visible'));
-        });
-    }
-
-    showTemplateEditor() {
-        document.getElementById('dashboardSection').style.display = 'none';
-        document.getElementById('templateEditorSection').style.display = 'block';
-        document.getElementById('templateEditorTableWrapper').style.display = 'none';
-    }
-
-    loadTemplateForEdit() {
-        this.currentTemplateMode = document.getElementById('templateMode').value;
-        this.currentTemplateType = document.getElementById('templateType').value;
-        const rows = this.templates[this.currentTemplateMode][this.currentTemplateType] || [];
-        this.renderTemplateEditorTable(rows);
-        document.getElementById('templateEditorTableWrapper').style.display = 'block';
-    }
-
-    renderTemplateEditorTable(rows) {
-        const tbody = document.getElementById('templateEditorTbody');
-        tbody.innerHTML = '';
-        rows.forEach((row, index) => {
-            const tr = document.createElement('tr');
-            tr.dataset.rowId = index;
-            tr.innerHTML = `
-                <td><input value="${row.processStep || ''}"></td>
-                <td><input value="${row.failureMode || ''}"></td>
-                <td><input value="${row.effect || ''}"></td>
-                <td><input type="number" min="1" max="10" value="${row.severity || 1}"></td>
-                <td><input type="number" min="1" max="10" value="${row.occurrence || 1}"></td>
-                <td><input type="number" min="1" max="10" value="${row.detection || 1}"></td>
-                <td><input value="${row.currentControls || ''}"></td>
-                <td><input value="${row.recommendedActions || ''}"></td>
-                <td><input type="number" min="1" max="10" value="${row.revisedSeverity || 1}"></td>
-                <td><input type="number" min="1" max="10" value="${row.revisedOccurrence || 1}"></td>
-                <td><input type="number" min="1" max="10" value="${row.revisedDetection || 1}"></td>
-                <td><button id="removeTemplateRowBtn" data-row-id="${index}"><i class="fas fa-trash"></i></button></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    addTemplateRow() {
-        const rows = this.templates[this.currentTemplateMode][this.currentTemplateType] || [];
-        rows.push({
-            processStep: '',
-            failureMode: '',
-            effect: '',
-            severity: 1,
-            occurrence: 1,
-            detection: 1,
-            currentControls: '',
-            recommendedActions: '',
-            revisedSeverity: 1,
-            revisedOccurrence: 1,
-            revisedDetection: 1
-        });
-        this.templates[this.currentTemplateMode][this.currentTemplateType] = rows;
-        this.renderTemplateEditorTable(rows);
-    }
-
-    removeTemplateRow(rowId) {
-        let rows = this.templates[this.currentTemplateMode][this.currentTemplateType];
-        rows.splice(rowId, 1);
-        this.renderTemplateEditorTable(rows);
-    }
-
-    saveTemplate() {
-        const tbody = document.getElementById('templateEditorTbody');
-        const rows = Array.from(tbody.rows).map(tr => ({
-            processStep: tr.cells[0].querySelector('input').value,
-            failureMode: tr.cells[1].querySelector('input').value,
-            effect: tr.cells[2].querySelector('input').value,
-            severity: parseInt(tr.cells[3].querySelector('input').value) || 1,
-            occurrence: parseInt(tr.cells[4].querySelector('input').value) || 1,
-            detection: parseInt(tr.cells[5].querySelector('input').value) || 1,
-            currentControls: tr.cells[6].querySelector('input').value,
-            recommendedActions: tr.cells[7].querySelector('input').value,
-            revisedSeverity: parseInt(tr.cells[8].querySelector('input').value) || 1,
-            revisedOccurrence: parseInt(tr.cells[9].querySelector('input').value) || 1,
-            revisedDetection: parseInt(tr.cells[10].querySelector('input').value) || 1
-        }));
-        this.templates[this.currentTemplateMode][this.currentTemplateType] = rows;
-        localStorage.setItem('pharmaRiskTemplates', JSON.stringify(this.templates));
-        alert('Template saved!');
-    }
-
-    generateTemplate(e) {
-        // Use this.templates instead of hardcoded
-        // Similar logic, but pull from this.templates[mode][type]
-    }
-
-    renderFMEATable(rows) {
-        // Updated for new columns
-        const tr.innerHTML = `
-            // Existing + 
-            <td><select class="fmea-input" data-field="riskEvaluation"><option value="Accept" ${row.riskEvaluation === 'Accept' ? 'selected' : ''}>Accept</option><option value="Reduce" ${row.riskEvaluation === 'Reduce' ? 'selected' : ''}>Reduce</option></select></td>
-            <td><input class="fmea-input" data-field="regReference" value="${row.regReference || ''}"></td>
-            // Revised...
-        `;
-    }
-
-    updateRowField(rowId, field, value) {
-        // Handle new fields
-    }
-
-    showFMEA(ass) {
-        // Load review notes
-        document.getElementById('reviewNotesText').value = ass.reviewNotes || '';
-    }
-
-    saveReviewNotes() {
-        const ass = this.assessments.find(a => a.id === this.currentAssessmentId);
-        ass.reviewNotes = document.getElementById('reviewNotesText').value;
-        this.saveData();
-        this.logAudit('Save Review Notes', { id: ass.id });
-        alert('Review notes saved!');
-    }
-
-    // Rest same
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
 }
 
-const app = new PharmaRiskApp();
+header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 2rem 1rem;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header h1 {
+    font-size: 2rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+header p {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+nav button {
+    padding: 0.75rem 1.5rem;
+    background: #ffffff;
+    color: #007bff;
+    border: 1px solid #007bff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+nav button:hover {
+    background: #007bff;
+    color: white;
+}
+
+#authSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#userDisplay {
+    color: white;
+    font-weight: 500;
+}
+
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+section {
+    background: white;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s;
+}
+
+section:hover {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #0056b3;
+}
+
+h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #495057;
+}
+
+form {
+    display: grid;
+    gap: 1rem;
+}
+
+label {
+    font-weight: 500;
+}
+
+input, textarea, select {
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+button[type="submit"], .nextStep, .prevStep {
+    background: #28a745;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+button[type="submit"]:hover, .nextStep:hover, .prevStep:hover {
+    background: #218838;
+}
+
+button#cancelBtn, button#cancelWizardBtn {
+    background: #6c757d;
+}
+
+button#cancelBtn:hover, button#cancelWizardBtn:hover {
+    background: #5a6268;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    background: #f1f3f5;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+
+li:hover {
+    transform: translateY(-2px);
+}
+
+li button {
+    background: #dc3545;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+li button:hover {
+    background: #c82333;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th, td {
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+th {
+    background: #e9ecef;
+    font-weight: 600;
+    color: #495057;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+input[type="number"] {
+    width: 70px;
+}
+
+.rpn {
+    font-weight: bold;
+}
+
+.rpn-low {
+    color: #28a745;
+}
+
+.rpn-medium {
+    color: #ffc107;
+}
+
+.rpn-high {
+    color: #dc3545;
+}
+
+#regContent {
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+#regContent a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#regContent a:hover {
+    text-decoration: underline;
+}
+
+#auditUl li {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.step {
+    display: grid;
+    gap: 1rem;
+}
+
+.note {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 1rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.chart-container {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.summary-stats {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.summary-stats p {
+    margin: 0.5rem 0;
+    font-weight: 500;
+}
+
+.summary-stats span {
+    color: #007bff;
+}
+
+footer {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.9rem;
+    margin-top: 3rem;
+}
+
+/* Accessibility & Responsiveness */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    nav {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    section {
+        padding: 1rem;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+
+    input[type="number"] {
+        width: 60px;
+    }
+}
+
+:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
