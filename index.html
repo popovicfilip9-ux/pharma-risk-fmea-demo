@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PharmaRisk: Professional FMEA Risk Assessment Platform</title>
+    <title>PharmaRisk: Enhanced FMEA Risk Assessment Platform</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <header>
@@ -18,7 +20,7 @@
             <div id="authSection">
                 <button id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
                 <button id="logoutBtn" style="display: none;"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                <span id="userDisplay" style="display: none;">Logged in as: <span id="username"></span></span>
+                <span id="userDisplay" style="display: none;">Logged in as: <span id="username"></span> (<span id="userRole"></span>)</span>
             </div>
             <button id="dashboardBtn" style="display: none;"><i class="fas fa-chart-bar"></i> Dashboard</button>
             <button id="newAssessmentBtn" style="display: none;"><i class="fas fa-plus"></i> New Assessment</button>
@@ -31,6 +33,24 @@
     </header>
 
     <main>
+        <section id="loginForm" style="display: none;">
+            <h2><i class="fas fa-user-lock"></i> Secure Login</h2>
+            <form id="loginFormEl">
+                <label for="user">Username:</label>
+                <input type="text" id="user" required>
+                <label for="pass">Password:</label>
+                <input type="password" id="pass" required>
+                <label for="role">Role:</label>
+                <select id="role" required>
+                    <option value="admin">Administrator</option>
+                    <option value="assessor">Risk Assessor</option>
+                    <option value="viewer">Viewer</option>
+                </select>
+                <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+            </form>
+            <p class="note">Demo mode: Any credentials accepted with role selection.</p>
+        </section>
+
         <section id="dashboardSection" style="display: none;">
             <h2><i class="fas fa-chart-bar"></i> Risk Dashboard</h2>
             <div class="dashboard-grid">
@@ -49,11 +69,65 @@
                     <p>Average RPN: <span id="avgRPN">0</span></p>
                     <p>High RPN Risks (>500): <span id="highRPNCount">0</span></p>
                 </div>
+                <div class="heatmap-container">
+                    <h3>Risk Heatmap</h3>
+                    <div id="riskHeatmap"></div>
+                </div>
             </div>
             <button id="backFromDashboardBtn"><i class="fas fa-arrow-left"></i> Back to Assessments</button>
         </section>
 
-        <!-- Other sections remain the same -->
+        <!-- Other sections: assessmentsList, assessmentForm, fmeaSection (updated with approval), templateEditorSection, auditTrailSection, regReferencesSection (searchable), wizardSection -->
+
+        <section id="regReferencesSection" style="display: none;">
+            <h2><i class="fas fa-book"></i> Regulatory References</h2>
+            <input type="text" id="regSearch" placeholder="Search references...">
+            <div id="regContent"></div>
+            <button id="backFromRegBtn"><i class="fas fa-arrow-left"></i> Back</button>
+        </section>
+
+        <section id="fmeaSection" style="display: none;">
+            <h2><i class="fas fa-table"></i> FMEA for <span id="currentTitle"></span></h2>
+            <button id="addRowBtn"><i class="fas fa-plus-circle"></i> Add Row</button>
+            <button id="sortByRPNBtn"><i class="fas fa-sort-amount-down"></i> Sort by RPN</button>
+            <button id="exportFMEABtn"><i class="fas fa-file-export"></i> Export FMEA (PDF/Excel)</button>
+            <div class="table-wrapper">
+                <table id="fmeaTable">
+                    <thead>
+                        <tr>
+                            <th>Process Step</th>
+                            <th>Failure Mode</th>
+                            <th>Effect</th>
+                            <th>Severity (1-10)</th>
+                            <th>Occurrence (1-10)</th>
+                            <th>Detection (1-10)</th>
+                            <th>RPN</th>
+                            <th>Current Controls</th>
+                            <th>Recommended Actions</th>
+                            <th>Responsibility</th>
+                            <th>Target Date</th>
+                            <th>Risk Evaluation</th>
+                            <th>Regulatory Ref</th>
+                            <th>Approval Status</th>
+                            <th>Revised S</th>
+                            <th>Revised O</th>
+                            <th>Revised D</th>
+                            <th>Revised RPN</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fmeaTbody"></tbody>
+                </table>
+            </div>
+            <div class="review-notes">
+                <h3>Review Notes (ICH Q9)</h3>
+                <textarea id="reviewNotesText" placeholder="Ongoing review notes..."></textarea>
+                <button id="saveReviewBtn"><i class="fas fa-save"></i> Save Review</button>
+            </div>
+            <button id="backToListBtn"><i class="fas fa-arrow-left"></i> Back</button>
+        </section>
+
+        <!-- Rest of sections... -->
     </main>
 
     <footer>
