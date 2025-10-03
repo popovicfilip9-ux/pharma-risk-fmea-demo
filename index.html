@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaRisk FMEA Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>PharmaRisk: State-of-the-Art FMEA Risk Assessment Platform</h1>
+        <p>Compliant with WHO, GDP, GMP, FDA, ICH, and global regulatory standards. This tool enables structured Failure Mode and Effects Analysis (FMEA) for pharmaceutical processes.</p>
+        <nav>
+            <button id="newAssessmentBtn">New Assessment</button>
+            <button id="exportBtn">Export All</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="assessmentsList">
+            <h2>Existing Assessments</h2>
+            <ul id="assessmentsUl"></ul>
+        </section>
+
+        <section id="assessmentForm" style="display: none;">
+            <h2 id="formTitle">New Risk Assessment</h2>
+            <form id="assessmentFormEl">
+                <label for="title">Assessment Title:</label>
+                <input type="text" id="title" required>
+
+                <label for="description">Description:</label>
+                <textarea id="description" rows="3"></textarea>
+
+                <button type="submit">Save Assessment</button>
+                <button type="button" id="cancelBtn">Cancel</button>
+            </form>
+        </section>
+
+        <section id="fmeaSection" style="display: none;">
+            <h2>FMEA Table for <span id="currentTitle"></span></h2>
+            <button id="addRowBtn">Add FMEA Row</button>
+            <button id="exportFMEABtn">Export FMEA</button>
+            <table id="fmeaTable">
+                <thead>
+                    <tr>
+                        <th>Process Step</th>
+                        <th>Failure Mode</th>
+                        <th>Effect</th>
+                        <th>Severity (S: 1-10)</th>
+                        <th>Occurrence (O: 1-10)</th>
+                        <th>Detection (D: 1-10)</th>
+                        <th>RPN (S*O*D)</th>
+                        <th>Current Controls</th>
+                        <th>Recommended Actions</th>
+                        <th>Responsibility</th>
+                        <th>Target Completion</th>
+                        <th>Revised S/O/D</th>
+                        <th>Revised RPN</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="fmeaTbody"></tbody>
+            </table>
+            <button id="backToListBtn">Back to Assessments</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>Demo Version | For compliance, consult regulatory experts. Data stored locally for demonstration.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
