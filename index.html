@@ -23,7 +23,6 @@
             <button id="dashboardBtn" style="display: none;"><i class="fas fa-chart-bar"></i> Dashboard</button>
             <button id="newAssessmentBtn" style="display: none;"><i class="fas fa-plus"></i> New Assessment</button>
             <button id="templateWizardBtn" style="display: none;"><i class="fas fa-magic"></i> Template Wizard</button>
-            <button id="templateEditorBtn" style="display: none;"><i class="fas fa-edit"></i> Edit Templates</button>
             <button id="exportBtn" style="display: none;"><i class="fas fa-download"></i> Export All</button>
             <button id="auditTrailBtn" style="display: none;"><i class="fas fa-history"></i> Audit Trail</button>
             <button id="regReferencesBtn"><i class="fas fa-book"></i> Regulations</button>
@@ -98,71 +97,21 @@
                             <th>Occurrence (1-10)</th>
                             <th>Detection (1-10)</th>
                             <th>RPN</th>
-                            <th>Current Controls</th>
-                            <th>Recommended Actions</th>
+                            <th>Controls</th>
+                            <th>Actions</th>
                             <th>Responsibility</th>
                             <th>Target Date</th>
-                            <th>Risk Evaluation (Accept/Reduce)</th>
-                            <th>Regulatory Reference (e.g., ICH Q9)</th>
-                            <th>Revised S</th>
-                            <th>Revised O</th>
-                            <th>Revised D</th>
-                            <th>Revised RPN</th>
+                            <th>Rev. S</th>
+                            <th>Rev. O</th>
+                            <th>Rev. D</th>
+                            <th>Rev. RPN</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="fmeaTbody"></tbody>
                 </table>
             </div>
-            <div id="reviewNotes" class="review-notes">
-                <h3>Review Notes (ICH Q9 Compliant)</h3>
-                <textarea id="reviewNotesText" placeholder="Enter ongoing review notes, new knowledge, etc."></textarea>
-                <button id="saveReviewBtn"><i class="fas fa-save"></i> Save Review</button>
-            </div>
             <button id="backToListBtn"><i class="fas fa-arrow-left"></i> Back</button>
-        </section>
-
-        <section id="templateEditorSection" style="display: none;">
-            <h2><i class="fas fa-edit"></i> Template Editor</h2>
-            <p>Edit base templates for transport modes and product types. Changes apply to future generations.</p>
-            <label for="templateMode">Select Mode:</label>
-            <select id="templateMode">
-                <option value="air">Air</option>
-                <option value="sea">Sea</option>
-                <option value="road">Road</option>
-                <option value="multi">Multi-Modal</option>
-            </select>
-            <label for="templateType">Select Product Type:</label>
-            <select id="templateType">
-                <option value="coldchain">Cold Chain</option>
-                <option value="ambient">Ambient</option>
-                <option value="hazardous">Hazardous</option>
-            </select>
-            <button id="loadTemplateBtn">Load Template</button>
-            <div id="templateEditorTableWrapper" style="display: none;">
-                <table id="templateEditorTable">
-                    <thead>
-                        <tr>
-                            <th>Process Step</th>
-                            <th>Failure Mode</th>
-                            <th>Effect</th>
-                            <th>Severity</th>
-                            <th>Occurrence</th>
-                            <th>Detection</th>
-                            <th>Controls</th>
-                            <th>Actions</th>
-                            <th>Rev S</th>
-                            <th>Rev O</th>
-                            <th>Rev D</th>
-                            <th>Remove</th>
-                        </tr>
-                    </thead>
-                    <tbody id="templateEditorTbody"></tbody>
-                </table>
-                <button id="addTemplateRowBtn"><i class="fas fa-plus"></i> Add Row</button>
-                <button id="saveTemplateBtn"><i class="fas fa-save"></i> Save Template</button>
-            </div>
-            <button id="backFromTemplateEditorBtn"><i class="fas fa-arrow-left"></i> Back</button>
         </section>
 
         <section id="auditTrailSection" style="display: none;">
@@ -210,7 +159,7 @@
                     <label>Route (Optional):</label>
                     <textarea id="routeDetails" placeholder="e.g., USA to EU via air"></textarea>
                     <button type="button" class="prevStep"><i class="fas fa-arrow-left"></i> Back</button>
-                    <button type="submit"><i class="fas fa-check"></i> Generate</button>
+                    <button type="submit"><i class="fas fa-check"></i> Generate Template</button>
                 </div>
             </form>
             <button id="cancelWizardBtn"><i class="fas fa-times"></i> Cancel</button>
