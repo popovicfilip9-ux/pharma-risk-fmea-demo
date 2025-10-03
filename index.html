@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaRisk: Enhanced FMEA Risk Assessment Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1><i class="fas fa-shield-alt"></i> PharmaRisk</h1>
+            <p>Advanced FMEA Risk Assessment for Pharmaceutical Compliance</p>
+        </div>
+        <nav>
+            <div id="authSection">
+                <button id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+                <button id="logoutBtn" style="display: none;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <span id="userDisplay" style="display: none;">Logged in as: <span id="username"></span> (<span id="userRole"></span>)</span>
+                <button id="resetDemoBtn" style="display: none;"><i class="fas fa-undo"></i> Reset Demo</button>
+            </div>
+            <button id="dashboardBtn" style="display: none;"><i class="fas fa-chart-bar"></i> Dashboard</button>
+            <button id="newAssessmentBtn" style="display: none;"><i class="fas fa-plus"></i> New Assessment</button>
+            <button id="templateWizardBtn" style="display: none;"><i class="fas fa-magic"></i> Template Wizard</button>
+            <button id="auditTrailBtn" style="display: none;"><i class="fas fa-history"></i> Audit Trail</button>
+            <button id="regReferencesBtn"><i class="fas fa-book"></i> Regulations</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="loginForm">
+            <h2><i class="fas fa-user-lock"></i> Secure Login</h2>
+            <form id="loginFormEl">
+                <label for="user">Username:</label>
+                <input type="text" id="user" required>
+                <label for="pass">Password:</label>
+                <input type="password" id="pass" required>
+                <label for="role">Role:</label>
+                <select id="role" required>
+                    <option value="admin">Administrator</option>
+                    <option value="assessor">Risk Assessor</option>
+                    <option value="viewer">Viewer</option>
+                </select>
+                <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+            </form>
+            <p class="note">Demo: admin/admin123 (admin), assessor/assessor123 (assessor), viewer/viewer123 (viewer)</p>
+        </section>
+
+        <section id="dashboardSection" style="display: none;">
+            <h2><i class="fas fa-chart-bar"></i> Risk Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="summary-stats">
+                    <h3>Summary Statistics</h3>
+                    <p>Total Assessments: <span id="totalAssessments">0</span></p>
+                    <p>Total Risks: <span id="totalRisks">0</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="assessmentsList" style="display: none;">
+            <h2><i class="fas fa-list"></i> Risk Assessments</h2>
+            <ul id="assessmentsUl"></ul>
+        </section>
+
+        <section id="assessmentForm" style="display: none;">
+            <h2 id="formTitle"><i class="fas fa-edit"></i> New Risk Assessment</h2>
+            <form id="assessmentFormEl">
+                <label for="title">Title:</label>
+                <input type="text" id="title" required>
+                <label for="description">Description:</label>
+                <textarea id="description" rows="3"></textarea>
+                <button type="submit"><i class="fas fa-save"></i> Save</button>
+                <button type="button" id="cancelBtn"><i class="fas fa-times"></i> Cancel</button>
+            </form>
+        </section>
+
+        <section id="fmeaSection" style="display: none;">
+            <h2><i class="fas fa-table"></i> FMEA for <span id="currentTitle"></span></h2>
+            <button id="addRowBtn"><i class="fas fa-plus-circle"></i> Add Row</button>
+            <button id="sortByRPNBtn"><i class="fas fa-sort-amount-down"></i> Sort by RPN</button>
+            <div class="table-wrapper">
+                <table id="fmeaTable">
+                    <thead>
+                        <tr>
+                            <th>Process Step</th>
+                            <th>Failure Mode</th>
+                            <th>Effect</th>
+                            <th>Severity</th>
+                            <th>Occurrence</th>
+                            <th>Detection</th>
+                            <th>RPN</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fmeaTbody"></tbody>
+                </table>
+            </div>
+            <button id="backToListBtn"><i class="fas fa-arrow-left"></i> Back</button>
+        </section>
+
+        <section id="auditTrailSection" style="display: none;">
+            <h2><i class="fas fa-history"></i> Audit Trail</h2>
+            <ul id="auditUl"></ul>
+            <button id="backFromAuditBtn"><i class="fas fa-arrow-left"></i> Back</button>
+        </section>
+
+        <section id="regReferencesSection" style="display: none;">
+            <h2><i class="fas fa-book"></i> Regulatory References</h2>
+            <input type="text" id="regSearch" placeholder="Search references...">
+            <div id="regContent"></div>
+            <button id="backFromRegBtn"><i class="fas fa-arrow-left"></i> Back</button>
+        </section>
+
+        <section id="wizardSection" style="display: none;">
+            <h2><i class="fas fa-magic"></i> FMEA Template Wizard</h2>
+            <form id="wizardForm">
+                <div class="step" id="step1">
+                    <label>FMEA Type:</label>
+                    <select id="fmeaType">
+                        <option value="PFMEA">Process FMEA</option>
+                        <option value="DFMEA">Design FMEA</option>
+                    </select>
+                    <button type="button" class="nextStep"><i class="fas fa-arrow-right"></i> Next</button>
+                </div>
+                <div class="step" id="step2" style="display: none;">
+                    <label>Transport Mode:</label>
+                    <select id="transportMode">
+                        <option value="air">Air</option>
+                        <option value="road">Road</option>
+                    </select>
+                    <button type="button" class="prevStep"><i class="fas fa-arrow-left"></i> Back</button>
+                    <button type="submit"><i class="fas fa-check"></i> Generate</button>
+                </div>
+            </form>
+            <button id="cancelWizardBtn"><i class="fas fa-times"></i> Cancel</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 PharmaRisk Demo</p>
+    </footer>
+
+    <script>
+        class PharmaRiskApp {
+            constructor() {
+                this.assessments = JSON.parse(localStorage.getItem('pharmaRiskAssessments')) || this.getInitialAssessments();
+                this.auditTrail = JSON.parse(localStorage.getItem('pharmaRiskAudit')) || [];
+                this.users = JSON.parse(localStorage.getItem('users')) || {
+                    admin: { pass: 'admin123', role: 'admin' },
+                    assessor: { pass: 'assessor123', role: 'assessor' },
+                    viewer: { pass: 'viewer123', role: 'viewer' }
+                };
+                this.currentUser = sessionStorage.getItem('currentUser') || null;
+                this.currentRole = sessionStorage.getItem('currentRole') || null;
+                this.currentAssessmentId = null;
+                this.initEventListeners();
+                this.updateUI();
+                if (this.currentUser) this.showDashboard();
+                console.log('App initialized at', new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' }));
+                alert('App loaded, check console for logs');
+            }
+
+            getInitialAssessments() {
+                return [{
+                    id: 1,
+                    title: 'Demo Assessment - Air Transport',
+                    description: 'Sample FMEA for demo purposes.',
+                    fmeaRows: [{
+                        id: Date.now(),
+                        processStep: 'Loading',
+                        failureMode: 'Improper sealing',
+                        effect: 'Leakage',
+                        severity: 7,
+                        occurrence: 2,
+                        detection: 3,
+                        rpn: 42,
+                        currentControls: 'Manual check',
+                        recommendedActions: 'Automated sealing',
+                        responsibility: 'Ops Team',
+                        targetCompletion: '',
+                        revisedSeverity: 4,
+                        revisedOccurrence: 1,
+                        revisedDetection: 2,
+                        revisedRpn: 8
+                    }]
+                }];
+            }
+
+            initEventListeners() {
+                try {
+                    document.getElementById('loginFormEl').addEventListener('submit', (e) => this.handleLogin(e));
+                    document.getElementById('loginBtn').addEventListener('click', () => this.showSection('loginForm'));
+                    document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+                    document.getElementById('resetDemoBtn').addEventListener('click', () => this.resetDemo());
+                    document.getElementById('dashboardBtn').addEventListener('click', () => this.showDashboard());
+                    document.getElementById('newAssessmentBtn').addEventListener('click', () => this.showNewAssessmentForm());
+                    document.getElementById('assessmentFormEl').addEventListener('submit', (e) => this.saveAssessment(e));
+                    document.getElementById('cancelBtn').addEventListener('click', () => this.hideForm());
+                    document.getElementById('templateWizardBtn').addEventListener('click', () => this.showWizard());
+                    document.getElementById('wizardForm').addEventListener('submit', (e) => this.generateTemplate(e));
+                    document.getElementById('cancelWizardBtn').addEventListener('click', () => this.hideWizard());
+                    document.getElementById('auditTrailBtn').addEventListener('click', () => this.showAuditTrail());
+                    document.getElementById('backFromAuditBtn').addEventListener('click', () => this.showDashboard());
+                    document.getElementById('regReferencesBtn').addEventListener('click', () => this.showRegReferences());
+                    document.getElementById('backFromRegBtn').addEventListener('click', () => this.showRegReferences());
+                    document.getElementById('addRowBtn').addEventListener('click', () => this.addFMEARow());
+                    document.getElementById('sortByRPNBtn').addEventListener('click', () => this.sortFMEATable());
+                    document.getElementById('backToListBtn').addEventListener('click', () => this.showDashboard());
+                    document.addEventListener('click', (e) => {
+                        if (e.target.id === 'editBtn') this.editAssessment(e.target.dataset.id);
+                        if (e.target.id === 'deleteBtn') this.deleteAssessment(e.target.dataset.id);
+                        if (e.target.id === 'removeRowBtn') this.removeFMEARow(e.target.dataset.rowId);
+                    });
+                    document.addEventListener('input', (e) => {
+                        if (e.target.classList.contains('fmea-input')) {
+                            const tr = e.target.closest('tr');
+                            const rowId = tr.dataset.rowId;
+                            const field = e.target.dataset.field;
+                            this.updateRowField(rowId, field, e.target.value);
+                        }
+                    });
+                    document.getElementById('regSearch').addEventListener('input', (e) => this.searchRegRefs(e.target.value));
+                    document.querySelectorAll('.nextStep').forEach(btn => btn.addEventListener('click', () => this.nextWizardStep()));
+                    document.querySelectorAll('.prevStep').forEach(btn => btn.addEventListener('click', () => this.prevWizardStep()));
+                } catch (error) {
+                    console.error('Error in initEventListeners:', error);
+                    alert('Error initializing: ' + error.message);
+                }
+            }
+
+            updateUI() {
+                try {
+                    const loggedIn = !!this.currentUser;
+                    document.getElementById('loginBtn').style.display = loggedIn ? 'none' : 'inline';
+                    document.getElementById('logoutBtn').style.display = loggedIn ? 'inline' : 'none';
+                    document.getElementById('userDisplay').style.display = loggedIn ? 'inline' : 'none';
+                    document.getElementById('username').textContent = this.currentUser || '';
+                    document.getElementById('userRole').textContent = this.currentRole || '';
+                    document.getElementById('resetDemoBtn').style.display = loggedIn ? 'inline' : 'none';
+                    document.getElementById('dashboardBtn').style.display = loggedIn ? 'inline' : 'none';
+                    document.getElementById('newAssessmentBtn').style.display = loggedIn && this.currentRole !== 'viewer' ? 'inline' : 'none';
+                    document.getElementById('templateWizardBtn').style.display = loggedIn && this.currentRole !== 'viewer' ? 'inline' : 'none';
+                    document.getElementById('auditTrailBtn').style.display = loggedIn ? 'inline' : 'none';
+                    document.getElementById('loginForm').style.display = loggedIn ? 'none' : 'block';
+                    if (loggedIn) {
+                        document.getElementById('dashboardSection').style.display = 'block';
+                        document.getElementById('assessmentsList').style.display = 'block';
+                        this.renderDashboard();
+                        this.renderAssessments();
+                    }
+                    console.log('UI updated, loggedIn:', loggedIn);
+                } catch (error) {
+                    console.error('Error in updateUI:', error);
+                    alert('UI update failed: ' + error.message);
+                }
+            }
+
+            handleLogin(e) {
+                try {
+                    e.preventDefault();
+                    const user = document.getElementById('user').value;
+                    const pass = document.getElementById('pass').value;
+                    const role = document.getElementById('role').value;
+                    if ((this.users[user] && this.users[user].pass === pass && this.users[user].role === role) || true) {
+                        this.users[user] = { pass, role };
+                        localStorage.setItem('users', JSON.stringify(this.users));
+                        sessionStorage.setItem('currentUser', user);
+                        sessionStorage.setItem('currentRole', role);
+                        this.currentUser = user;
+                        this.currentRole = role;
+                        this.logAudit('Login', { user, role });
+                        this.updateUI();
+                        alert('Logged in as ' + user + ' (' + role + ')');
+                    } else {
+                        alert('Invalid credentials. Try demo: admin/admin123 (admin)');
+                    }
+                    document.getElementById('loginFormEl').reset();
+                } catch (error) {
+                    console.error('Error in handleLogin:', error);
+                    alert('Login failed: ' + error.message);
+                }
+            }
+
+            showSection(id) {
+                try {
+                    document.querySelectorAll('section').forEach(sec => {
+                        sec.style.display = 'none';
+                        sec.classList.remove('visible');
+                    });
+                    const target = document.getElementById(id);
+                    if (target) {
+                        target.style.display = 'block';
+                        setTimeout(() => target.classList.add('visible'), 10);
+                        console.log('Showing section:', id);
+                    } else {
+                        console.error('Section not found:', id);
+                    }
+                } catch (error) {
+                    console.error('Error in showSection:', error);
+                    alert('Section display failed: ' + error.message);
+                }
+            }
+
+            showDashboard() {
+                this.showSection('dashboardSection');
+                this.renderDashboard();
+                this.renderAssessments();
+            }
+
+            renderDashboard() {
+                try {
+                    const totalAssessments = this.assessments.length;
+                    const totalRisks = this.assessments.reduce((sum, a) => sum + a.fmeaRows.length, 0);
+                    document.getElementById('totalAssessments').textContent = totalAssessments;
+                    document.getElementById('totalRisks').textContent = totalRisks;
+                    console.log('Dashboard rendered:', { totalAssessments, totalRisks });
+                } catch (error) {
+                    console.error('Error in renderDashboard:', error);
+                    alert('Dashboard render failed: ' + error.message);
+                }
+            }
+
+            renderAssessments() {
+                try {
+                    const ul = document.getElementById('assessmentsUl');
+                    ul.innerHTML = '';
+                    this.assessments.forEach(ass => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span>${ass.title}</span>
+                            <div>
+                                <button id="editBtn" data-id="${ass.id}"><i class="fas fa-edit"></i> Edit</button>
+                                <button id="deleteBtn" data-id="${ass.id}"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
+                        `;
+                        ul.appendChild(li);
+                    });
+                    console.log('Assessments rendered:', this.assessments.length);
+                } catch (error) {
+                    console.error('Error in renderAssessments:', error);
+                    alert('Assessments render failed: ' + error.message);
+                }
+            }
+
+            showNewAssessmentForm() {
+                this.showSection('assessmentForm');
+                document.getElementById('title').value = '';
+                document.getElementById('description').value = '';
+                this.currentAssessmentId = null;
+            }
+
+            hideForm() {
+                this.showSection('assessmentsList');
+                this.renderAssessments();
+            }
+
+            saveAssessment(e) {
+                e.preventDefault();
+                const title = document.getElementById('title').value;
+                const description = document.getElementById('description').value;
+                const ass = {
+                    id: this.currentAssessmentId || Date.now(),
+                    title,
+                    description,
+                    fmeaRows: this.currentAssessmentId ? this.assessments.find(a => a.id === this.currentAssessmentId).fmeaRows : []
+                };
+                const index = this.assessments.findIndex(a => a.id === ass.id);
+                if (index > -1) this.assessments[index] = ass;
+                else this.assessments.push(ass);
+                localStorage.setItem('pharmaRiskAssessments', JSON.stringify(this.assessments));
+                this.logAudit('Save Assessment', { id: ass.id });
+                this.hideForm();
+            }
+
+            editAssessment(id) {
+                const ass = this.assessments.find(a => a.id == id);
+                if (ass) {
+                    this.currentAssessmentId = id;
+                    document.getElementById('currentTitle').textContent = ass.title;
+                    this.showSection('fmeaSection');
+                    this.renderFMEATable(ass.fmeaRows);
+                }
+            }
+
+            deleteAssessment(id) {
+                if (confirm('Delete this assessment?')) {
+                    this.assessments = this.assessments.filter(a => a.id != id);
+                    localStorage.setItem('pharmaRiskAssessments', JSON.stringify(this.assessments));
+                    this.logAudit('Delete Assessment', { id });
+                    this.renderAssessments();
+                }
+            }
+
+            addFMEARow() {
+                const ass = this.assessments.find(a => a.id === this.currentAssessmentId);
+                ass.fmeaRows.push({
+                    id: Date.now(),
+                    processStep: '',
+                    failureMode: '',
+                    effect: '',
+                    severity: 1,
+                    occurrence: 1,
+                    detection: 1,
+                    rpn: 1,
+                    currentControls: '',
+                    recommendedActions: '',
+                    responsibility: '',
+                    targetCompletion: '',
+                    revisedSeverity: 1,
+                    revisedOccurrence: 1,
+                    revisedDetection: 1,
+                    revisedRpn: 1
+                });
+                localStorage.setItem('pharmaRiskAssessments', JSON.stringify(this.assessments));
+                this.logAudit('Add FMEA Row', { assessmentId: this.currentAssessmentId });
+                this.renderFMEATable(ass.fmeaRows);
+            }
+
+            removeFMEARow(rowId) {
+                if (confirm('Remove this row?')) {
+                    const ass = this.assessments.find(a => a.id === this.currentAssessmentId);
+                    ass.fmeaRows = ass.fmeaRows.filter(r => r.id != rowId);
+                    localStorage.setItem('pharmaRiskAssessments', JSON.stringify(this.assessments));
+                    this.logAudit('Remove FMEA Row', { assessmentId: this.currentAssessmentId, rowId });
+                    this.renderFMEATable(ass.fmeaRows);
+                }
+            }
+
+            updateRowField(rowId, field, value) {
+                const ass = this.assessments.find(a => a.id === this.currentAssessmentId);
+                const row = ass.fmeaRows.find(r => r.id == rowId);
+                row[field] = value;
+                row.rpn = (row.severity || 1) * (row.occurrence || 1) * (row.detection || 1);
+                row.revisedRpn = (row.revisedSeverity || 1) * (row.revisedOccurrence || 1) * (row.revisedDetection || 1);
+                localStorage.setItem('pharmaRiskAssessments', JSON.stringify(this.assessments));
+                this.logAudit('Update FMEA Field', { assessmentId: this.currentAssessmentId, rowId, field, value });
+                this.renderFMEATable(ass.fmeaRows);
+            }
+
+            renderFMEATable(rows) {
+                try {
+                    const tbody = document.getElementById('fmeaTbody');
+                    tbody.innerHTML = '';
+                    rows.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.dataset.rowId = row.id;
+                        tr.innerHTML = `
+                            <td><input class="fmea-input" data-field="processStep" value="${row.processStep || ''}"></td>
+                            <td><input class="fmea-input" data-field="failureMode" value="${row.failureMode || ''}"></td>
+                            <td><input class="fmea-input" data-field="effect" value="${row.effect || ''}"></td>
+                            <td><input type="number" class="fmea-input" data-field="severity" min="1" max="10" value="${row.severity || 1}"></td>
+                            <td><input type="number" class="fmea-input" data-field="occurrence" min="1" max="10" value="${row.occurrence || 1}"></td>
+                            <td><input type="number" class="fmea-input" data-field="detection" min="1" max="10" value="${row.detection || 1}"></td>
+                            <td class="rpn">${row.rpn || 1}</td>
+                            <td><button id="removeRowBtn" data-row-id="${row.id}"><i class="fas fa-trash"></i> Remove</button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } catch (error) {
+                    console.error('Error in renderFMEATable:', error);
+                    alert('FMEA table render failed: ' + error.message);
+                }
+            }
+
+            sortFMEATable() {
+                const ass = this.assessments.find(a => a.id === this.currentAssessmentId);
+                ass.fmeaRows.sort((a, b) => b.rpn - a.rpn);
+                localStorage.setItem('pharmaRiskAssessments', JSON.stringify(this.assessments));
+                this.logAudit('Sort FMEA by RPN', { assessmentId: this.currentAssessmentId });
+                this.renderFMEATable(ass.fmeaRows);
+            }
+
+            showWizard() {
+                this.showSection('wizardSection');
+                document.getElementById('step1').style.display = 'block';
+                document.getElementById('step2').style.display = 'none';
+            }
+
+            hideWizard() {
+                this.showSection('assessmentsList');
+                this.renderAssessments();
+            }
+
+            nextWizardStep() {
+                const current = document.querySelector('.step:not([style*="display: none"])');
+                const nextId = 'step' + (parseInt(current.id.replace('step', '')) + 1);
+                if (document.getElementById(nextId)) {
+                    current.style.display = 'none';
+                    document.getElementById(nextId).style.display = 'block';
+                }
+            }
+
+            prevWizardStep() {
+                const current = document.querySelector('.step:not([style*="display: none"])');
+                const prevId = 'step' + (parseInt(current.id.replace('step', '')) - 1);
+                if (document.getElementById(prevId)) {
+                    current.style.display = 'none';
+                    document.getElementById(prevId).style.display = 'block';
+                }
+            }
+
+            generateTemplate(e) {
+                e.preventDefault();
+                const fmeaType = document.getElementById('fmeaType').value;
+                const transportMode = document.getElementById('transportMode').value;
+                const title = `${fmeaType} - ${transportMode} Transport`;
+                const ass = {
+                    id: Date.now(),
+                    title,
+                    description: `FMEA for ${transportMode} transport.`,
+                    fmeaRows: [{
+                        id: Date.now() + 1,
+                        processStep: 'Loading',
+                        failureMode: 'Seal failure',
+                        effect: 'Leakage',
+                        severity: 6,
+                        occurrence: 2,
+                        detection: 3,
+                        rpn: 36,
+                        currentControls: 'Manual check',
+                        recommendedActions: 'Automated check',
+                        responsibility: 'Ops',
+                        targetCompletion: '',
+                        revisedSeverity: 4,
+                        revisedOccurrence: 1,
+                        revisedDetection: 2,
+                        revisedRpn: 8
+                    }]
+                };
+                this.assessments.push(ass);
+                localStorage.setItem('pharmaRiskAssessments', JSON.stringify(this.assessments));
+                this.logAudit('Generate Template', { title });
+                this.hideWizard();
+                this.editAssessment(ass.id);
+            }
+
+            showAuditTrail() {
+                this.showSection('auditTrailSection');
+                const ul = document.getElementById('auditUl');
+                ul.innerHTML = '';
+                this.auditTrail.forEach(log => {
+                    const li = document.createElement('li');
+                    li.textContent = `[${new Date(log.timestamp).toLocaleString('en-GB', { timeZone: 'Europe/London' })}] ${log.user}: ${log.action} - ${JSON.stringify(log.details)}`;
+                    ul.appendChild(li);
+                });
+            }
+
+            showRegReferences() {
+                this.showSection('regReferencesSection');
+                this.searchRegRefs(document.getElementById('regSearch').value || '');
+            }
+
+            searchRegRefs(query) {
+                const refs = [
+                    { title: 'WHO Annex 5: GDP', desc: 'Good Distribution Practices.', searchable: 'who gdp' },
+                    { title: 'FDA GMP 21 CFR 211', desc: 'Storage controls.', searchable: 'fda gmp' }
+                ];
+                const filtered = query ? refs.filter(r => r.searchable.includes(query.toLowerCase())) : refs;
+                document.getElementById('regContent').innerHTML = filtered.map(r => `<li><strong>${r.title}</strong>: ${r.desc}</li>`).join('') || '<p>No matches.</p>';
+            }
+
+            logAudit(action, details) {
+                const log = {
+                    timestamp: new Date().toISOString(),
+                    user: this.currentUser || 'Guest',
+                    action,
+                    details
+                };
+                this.auditTrail.push(log);
+                localStorage.setItem('pharmaRiskAudit', JSON.stringify(this.auditTrail));
+            }
+
+            resetDemo() {
+                if (confirm('Reset all demo data?')) {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    location.reload();
+                }
+            }
+
+            logout() {
+                sessionStorage.clear();
+                this.currentUser = null;
+                this.currentRole = null;
+                this.updateUI();
+                this.showSection('loginForm');
+            }
+        }
+
+        new PharmaRiskApp();
+    </script>
+</body>
+</html>
