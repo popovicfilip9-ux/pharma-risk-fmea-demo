@@ -3,21 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PharmaRisk FMEA Tool</title>
+    <title>PharmaRisk FMEA Tool - Enhanced</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>PharmaRisk: State-of-the-Art FMEA Risk Assessment Platform</h1>
-        <p>Compliant with WHO, GDP, GMP, FDA, ICH, and global regulatory standards. This tool enables structured Failure Mode and Effects Analysis (FMEA) for pharmaceutical processes.</p>
+        <h1>PharmaRisk: Enhanced FMEA Risk Assessment Platform</h1>
+        <p>Compliant with WHO, GDP, GMP, FDA, ICH. Now with login, audit trail, regulatory references, and template wizard for global transportation FMEA.</p>
         <nav>
-            <button id="newAssessmentBtn">New Assessment</button>
-            <button id="exportBtn">Export All</button>
+            <div id="authSection">
+                <button id="loginBtn">Login</button>
+                <button id="logoutBtn" style="display: none;">Logout</button>
+                <span id="userDisplay" style="display: none;">Logged in as: <span id="username"></span></span>
+            </div>
+            <button id="newAssessmentBtn" style="display: none;">New Assessment</button>
+            <button id="templateWizardBtn" style="display: none;">Template Wizard</button>
+            <button id="exportBtn" style="display: none;">Export All</button>
+            <button id="auditTrailBtn" style="display: none;">View Audit Trail</button>
+            <button id="regReferencesBtn">Regulatory References</button>
         </nav>
     </header>
 
     <main>
-        <section id="assessmentsList">
+        <section id="loginForm" style="display: none;">
+            <h2>Login</h2>
+            <form id="loginFormEl">
+                <label for="user">Username:</label>
+                <input type="text" id="user" required>
+                <label for="pass">Password:</label>
+                <input type="password" id="pass" required>
+                <button type="submit">Login</button>
+            </form>
+            <p>For demo: Use any username/password. In prod, use secure auth.</p>
+        </section>
+
+        <section id="assessmentsList" style="display: none;">
             <h2>Existing Assessments</h2>
             <ul id="assessmentsUl"></ul>
         </section>
@@ -27,10 +47,8 @@
             <form id="assessmentFormEl">
                 <label for="title">Assessment Title:</label>
                 <input type="text" id="title" required>
-
                 <label for="description">Description:</label>
                 <textarea id="description" rows="3"></textarea>
-
                 <button type="submit">Save Assessment</button>
                 <button type="button" id="cancelBtn">Cancel</button>
             </form>
@@ -54,7 +72,9 @@
                         <th>Recommended Actions</th>
                         <th>Responsibility</th>
                         <th>Target Completion</th>
-                        <th>Revised S/O/D</th>
+                        <th>Revised S</th>
+                        <th>Revised O</th>
+                        <th>Revised D</th>
                         <th>Revised RPN</th>
                         <th>Actions</th>
                     </tr>
@@ -63,10 +83,70 @@
             </table>
             <button id="backToListBtn">Back to Assessments</button>
         </section>
+
+        <section id="auditTrailSection" style="display: none;">
+            <h2>Audit Trail</h2>
+            <ul id="auditUl"></ul>
+            <button id="backFromAuditBtn">Back</button>
+        </section>
+
+        <section id="regReferencesSection" style="display: none;">
+            <h2>Regulatory References</h2>
+            <div id="regContent">
+                <!-- Populated via JS -->
+            </div>
+            <button id="backFromRegBtn">Back</button>
+        </section>
+
+        <section id="wizardSection" style="display: none;">
+            <h2>Template Wizard</h2>
+            <form id="wizardForm">
+                <div class="step" id="step1">
+                    <label>Select FMEA Type:</label>
+                    <select id="fmeaType">
+                        <option value="PFMEA">Process FMEA (PFMEA)</option>
+                        <option value="DFMEA">Design FMEA (DFMEA)</option>
+                        <option value="SFMEA">System FMEA (SFMEA)</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <button type="button" class="nextStep">Next</button>
+                </div>
+                <div class="step" id="step2" style="display: none;">
+                    <label>Select Domain:</label>
+                    <select id="domain">
+                        <option value="transportation">Transportation (Global)</option>
+                        <option value="manufacturing">Manufacturing</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <button type="button" class="prevStep">Previous</button>
+                    <button type="button" class="nextStep">Next</button>
+                </div>
+                <div class="step" id="step3" style="display: none;">
+                    <label>For Transportation: Select Mode:</label>
+                    <select id="transportMode">
+                        <option value="air">Air</option>
+                        <option value="sea">Sea</option>
+                        <option value="road">Road</option>
+                        <option value="multi">Multi-Modal</option>
+                    </select>
+                    <label>Product Type:</label>
+                    <select id="productType">
+                        <option value="coldchain">Cold Chain</option>
+                        <option value="ambient">Ambient</option>
+                        <option value="hazardous">Hazardous</option>
+                    </select>
+                    <label>Global Route Details (optional):</label>
+                    <textarea id="routeDetails"></textarea>
+                    <button type="button" class="prevStep">Previous</button>
+                    <button type="submit">Generate Template</button>
+                </div>
+            </form>
+            <button id="cancelWizardBtn">Cancel</button>
+        </section>
     </main>
 
     <footer>
-        <p>Demo Version | For compliance, consult regulatory experts. Data stored locally for demonstration.</p>
+        <p>Enhanced Demo | Use Firebase for prod auth/db/audit. Data local for demo.</p>
     </footer>
 
     <script src="script.js"></script>
