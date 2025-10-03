@@ -1,57 +1,164 @@
-/* styles.css - Smoother Transitions */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+// script.js - Updated with Smoother UX, Template Editor, Regulatory Elements
+class PharmaRiskApp {
+    constructor() {
+        this.assessments = JSON.parse(localStorage.getItem('pharmaRiskAssessments')) || [];
+        this.auditTrail = JSON.parse(localStorage.getItem('pharmaRiskAudit')) || [];
+        this.users = JSON.parse(localStorage.getItem('users')) || { admin: 'admin123' };
+        this.templates = JSON.parse(localStorage.getItem('pharmaRiskTemplates')) || this.getDefaultTemplates();
+        this.currentUser = sessionStorage.getItem('currentUser') || null;
+        this.currentAssessmentId = null;
+        this.currentTemplateMode = null;
+        this.currentTemplateType = null;
+        this.initEventListeners();
+        this.updateUI();
+        this.renderAssessments();
+    }
 
-body {
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #f8f9fa;
-    color: #333;
-    line-height: 1.6;
-    transition: background 0.3s ease;
+    getDefaultTemplates() {
+        return {
+            air: {
+                coldchain: [ /* rows */ ],
+                ambient: [],
+                hazardous: []
+            },
+            // Similar for sea, road, multi
+            // Populate with default rows from previous getTransportTemplateRows
+        };
+    }
+
+    initEventListeners() {
+        // Existing + new
+        document.getElementById('templateEditorBtn').addEventListener('click', () => this.showTemplateEditor());
+        document.getElementById('backFromTemplateEditorBtn').addEventListener('click', () => this.showDashboard());
+        document.getElementById('loadTemplateBtn').addEventListener('click', () => this.loadTemplateForEdit());
+        document.getElementById('addTemplateRowBtn').addEventListener('click', () => this.addTemplateRow());
+        document.getElementById('saveTemplateBtn').addEventListener('click', () => this.saveTemplate());
+        document.getElementById('saveReviewBtn').addEventListener('click', () => this.saveReviewNotes());
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'removeTemplateRowBtn') this.removeTemplateRow(e.target.dataset.rowId);
+        });
+        // For smooth transitions
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('section').forEach(sec => sec.classList.add('visible'));
+        });
+    }
+
+    showTemplateEditor() {
+        document.getElementById('dashboardSection').style.display = 'none';
+        document.getElementById('templateEditorSection').style.display = 'block';
+        document.getElementById('templateEditorTableWrapper').style.display = 'none';
+    }
+
+    loadTemplateForEdit() {
+        this.currentTemplateMode = document.getElementById('templateMode').value;
+        this.currentTemplateType = document.getElementById('templateType').value;
+        const rows = this.templates[this.currentTemplateMode][this.currentTemplateType] || [];
+        this.renderTemplateEditorTable(rows);
+        document.getElementById('templateEditorTableWrapper').style.display = 'block';
+    }
+
+    renderTemplateEditorTable(rows) {
+        const tbody = document.getElementById('templateEditorTbody');
+        tbody.innerHTML = '';
+        rows.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            tr.dataset.rowId = index;
+            tr.innerHTML = `
+                <td><input value="${row.processStep || ''}"></td>
+                <td><input value="${row.failureMode || ''}"></td>
+                <td><input value="${row.effect || ''}"></td>
+                <td><input type="number" min="1" max="10" value="${row.severity || 1}"></td>
+                <td><input type="number" min="1" max="10" value="${row.occurrence || 1}"></td>
+                <td><input type="number" min="1" max="10" value="${row.detection || 1}"></td>
+                <td><input value="${row.currentControls || ''}"></td>
+                <td><input value="${row.recommendedActions || ''}"></td>
+                <td><input type="number" min="1" max="10" value="${row.revisedSeverity || 1}"></td>
+                <td><input type="number" min="1" max="10" value="${row.revisedOccurrence || 1}"></td>
+                <td><input type="number" min="1" max="10" value="${row.revisedDetection || 1}"></td>
+                <td><button id="removeTemplateRowBtn" data-row-id="${index}"><i class="fas fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    addTemplateRow() {
+        const rows = this.templates[this.currentTemplateMode][this.currentTemplateType] || [];
+        rows.push({
+            processStep: '',
+            failureMode: '',
+            effect: '',
+            severity: 1,
+            occurrence: 1,
+            detection: 1,
+            currentControls: '',
+            recommendedActions: '',
+            revisedSeverity: 1,
+            revisedOccurrence: 1,
+            revisedDetection: 1
+        });
+        this.templates[this.currentTemplateMode][this.currentTemplateType] = rows;
+        this.renderTemplateEditorTable(rows);
+    }
+
+    removeTemplateRow(rowId) {
+        let rows = this.templates[this.currentTemplateMode][this.currentTemplateType];
+        rows.splice(rowId, 1);
+        this.renderTemplateEditorTable(rows);
+    }
+
+    saveTemplate() {
+        const tbody = document.getElementById('templateEditorTbody');
+        const rows = Array.from(tbody.rows).map(tr => ({
+            processStep: tr.cells[0].querySelector('input').value,
+            failureMode: tr.cells[1].querySelector('input').value,
+            effect: tr.cells[2].querySelector('input').value,
+            severity: parseInt(tr.cells[3].querySelector('input').value) || 1,
+            occurrence: parseInt(tr.cells[4].querySelector('input').value) || 1,
+            detection: parseInt(tr.cells[5].querySelector('input').value) || 1,
+            currentControls: tr.cells[6].querySelector('input').value,
+            recommendedActions: tr.cells[7].querySelector('input').value,
+            revisedSeverity: parseInt(tr.cells[8].querySelector('input').value) || 1,
+            revisedOccurrence: parseInt(tr.cells[9].querySelector('input').value) || 1,
+            revisedDetection: parseInt(tr.cells[10].querySelector('input').value) || 1
+        }));
+        this.templates[this.currentTemplateMode][this.currentTemplateType] = rows;
+        localStorage.setItem('pharmaRiskTemplates', JSON.stringify(this.templates));
+        alert('Template saved!');
+    }
+
+    generateTemplate(e) {
+        // Use this.templates instead of hardcoded
+        // Similar logic, but pull from this.templates[mode][type]
+    }
+
+    renderFMEATable(rows) {
+        // Updated for new columns
+        const tr.innerHTML = `
+            // Existing + 
+            <td><select class="fmea-input" data-field="riskEvaluation"><option value="Accept" ${row.riskEvaluation === 'Accept' ? 'selected' : ''}>Accept</option><option value="Reduce" ${row.riskEvaluation === 'Reduce' ? 'selected' : ''}>Reduce</option></select></td>
+            <td><input class="fmea-input" data-field="regReference" value="${row.regReference || ''}"></td>
+            // Revised...
+        `;
+    }
+
+    updateRowField(rowId, field, value) {
+        // Handle new fields
+    }
+
+    showFMEA(ass) {
+        // Load review notes
+        document.getElementById('reviewNotesText').value = ass.reviewNotes || '';
+    }
+
+    saveReviewNotes() {
+        const ass = this.assessments.find(a => a.id === this.currentAssessmentId);
+        ass.reviewNotes = document.getElementById('reviewNotesText').value;
+        this.saveData();
+        this.logAudit('Save Review Notes', { id: ass.id });
+        alert('Review notes saved!');
+    }
+
+    // Rest same
 }
 
-section {
-    background: white;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s ease;
-}
-
-section.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-section:hover {
-    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-}
-
-button {
-    transition: background 0.3s ease, transform 0.2s ease;
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-/* Review Notes */
-.review-notes {
-    margin-top: 1rem;
-}
-
-.review-notes textarea {
-    width: 100%;
-    min-height: 100px;
-}
-
-/* Template Editor */
-#templateEditorTableWrapper {
-    margin-top: 1rem;
-}
-
-/* Rest same as previous */
+const app = new PharmaRiskApp();
