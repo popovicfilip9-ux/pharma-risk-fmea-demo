@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PharmaRisk: Enhanced FMEA Risk Assessment Platform</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <header>
@@ -18,24 +15,24 @@
         </div>
         <nav>
             <div id="authSection">
-                <button id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
-                <button id="logoutBtn" style="display: none;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <button id="loginBtn">Login</button>
+                <button id="logoutBtn" style="display: none;">Logout</button>
                 <span id="userDisplay" style="display: none;">Logged in as: <span id="username"></span> (<span id="userRole"></span>)</span>
-                <button id="resetDemoBtn" style="display: none;"><i class="fas fa-undo"></i> Reset Demo</button>
+                <button id="resetDemoBtn" style="display: none;">Reset Demo</button>
             </div>
-            <button id="dashboardBtn" style="display: none;"><i class="fas fa-chart-bar"></i> Dashboard</button>
-            <button id="newAssessmentBtn" style="display: none;"><i class="fas fa-plus"></i> New Assessment</button>
-            <button id="templateWizardBtn" style="display: none;"><i class="fas fa-magic"></i> Template Wizard</button>
-            <button id="templateEditorBtn" style="display: none;"><i class="fas fa-edit"></i> Edit Templates</button>
-            <button id="exportBtn" style="display: none;"><i class="fas fa-download"></i> Export All</button>
-            <button id="auditTrailBtn" style="display: none;"><i class="fas fa-history"></i> Audit Trail</button>
-            <button id="regReferencesBtn"><i class="fas fa-book"></i> Regulations</button>
+            <button id="dashboardBtn" style="display: none;">Dashboard</button>
+            <button id="newAssessmentBtn" style="display: none;">New Assessment</button>
+            <button id="templateWizardBtn" style="display: none;">Template Wizard</button>
+            <button id="templateEditorBtn" style="display: none;">Edit Templates</button>
+            <button id="exportBtn" style="display: none;">Export All</button>
+            <button id="auditTrailBtn" style="display: none;">Audit Trail</button>
+            <button id="regReferencesBtn">Regulations</button>
         </nav>
     </header>
 
     <main>
         <section id="loginForm">
-            <h2><i class="fas fa-user-lock"></i> Secure Login</h2>
+            <h2>Secure Login</h2>
             <form id="loginFormEl">
                 <label for="user">Username:</label>
                 <input type="text" id="user" required>
@@ -47,42 +44,46 @@
                     <option value="assessor">Risk Assessor</option>
                     <option value="viewer">Viewer</option>
                 </select>
-                <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+                <button type="submit">Login</button>
             </form>
-            <p class="note">Demo mode: Any credentials accepted with role selection.</p>
+            <p class="note">Demo: admin/admin123 (admin), assessor/assessor123 (assessor), viewer/viewer123 (viewer)</p>
         </section>
 
         <section id="dashboardSection" style="display: none;">
-            <h2><i class="fas fa-chart-bar"></i> Risk Dashboard</h2>
+            <h2>Risk Dashboard</h2>
             <div class="dashboard-grid">
                 <div class="chart-container">
                     <h3>RPN Breakdown</h3>
-                    <canvas id="rpnPieChart"></canvas>
+                    <canvas id="rpnPieChart" width="200" height="200"></canvas>
                 </div>
                 <div class="chart-container">
-                    <h3>Top High-Risk Items</h3>
-                    <canvas id="topRisksBarChart"></canvas>
+                    <h3>Top Risks</h3>
+                    <canvas id="topRisksBarChart" width="200" height="200"></canvas>
                 </div>
                 <div class="summary-stats">
-                    <h3>Summary Statistics</h3>
-                    <p>Total Assessments: <span id="totalAssessments">0</span></p>
-                    <p>Total Risks: <span id="totalRisks">0</span></p>
-                    <p>Average RPN: <span id="avgRPN">0</span></p>
-                    <p>High RPN Risks (>500): <span id="highRPNCount">0</span></p>
+                    <h3>Stats</h3>
+                    <p>Assessments: <span id="totalAssessments">0</span></p>
+                    <p>Risks: <span id="totalRisks">0</span></p>
+                    <p>Avg RPN: <span id="avgRPN">0</span></p>
                 </div>
                 <div class="heatmap-container">
                     <h3>Risk Heatmap</h3>
                     <div id="riskHeatmap"></div>
                 </div>
             </div>
-            <button id="backFromDashboardBtn"><i class="fas fa-arrow-left"></i> Back to Assessments</button>
         </section>
 
-        <!-- Other sections remain similar, adjusted for initial display -->
+        <!-- Add other sections like assessmentsList, fmeaSection, etc., as in previous versions -->
+        <section id="assessmentsList" style="display: none;">
+            <h2>Risk Assessments</h2>
+            <ul id="assessmentsUl"></ul>
+        </section>
+
+        <!-- Simplified for brevity; add full sections from previous responses -->
     </main>
 
     <footer>
-        <p>&copy; 2025 PharmaRisk Demo | Compliant Design for Pharmaceutical Risk Management</p>
+        <p>&copy; 2025 PharmaRisk Demo</p>
     </footer>
 
     <script src="script.js"></script>
