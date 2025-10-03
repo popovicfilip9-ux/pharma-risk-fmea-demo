@@ -1,4 +1,4 @@
-/* styles.css - Professional Update */
+/* styles.css - Enhanced Professional Design */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 body {
@@ -101,6 +101,12 @@ h2 {
     align-items: center;
     gap: 0.5rem;
     color: #0056b3;
+}
+
+h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #495057;
 }
 
 form {
@@ -226,7 +232,18 @@ input[type="number"] {
 
 .rpn {
     font-weight: bold;
-    color: #007bff;
+}
+
+.rpn-low {
+    color: #28a745;
+}
+
+.rpn-medium {
+    color: #ffc107;
+}
+
+.rpn-high {
+    color: #dc3545;
 }
 
 #regContent {
@@ -262,6 +279,35 @@ input[type="number"] {
     font-size: 0.85rem;
     color: #6c757d;
     margin-top: 1rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.chart-container {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.summary-stats {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.summary-stats p {
+    margin: 0.5rem 0;
+    font-weight: 500;
+}
+
+.summary-stats span {
+    color: #007bff;
 }
 
 footer {
